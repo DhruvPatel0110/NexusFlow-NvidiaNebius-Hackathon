@@ -155,8 +155,25 @@ async def startup_event():
 
     # Initialize MasterDB
     try:
-        app_state["db"] = MasterDB()
+        db = MasterDB()
+        app_state["db"] = db
         logger.info("MasterDB initialized.")
+
+        # Check if database has articles; if empty, auto-seed canonical dataset immediately
+        try:
+            cursor = db.conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM articles")
+            count = cursor.fetchone()[0]
+            if count == 0:
+                logger.info("MasterDB is empty on startup. Auto-seeding canonical disruption dataset...")
+                from seed_sample_articles import sample_articles
+                for art in sample_articles:
+                    db.insert_article(art)
+                logger.info(f"Auto-seeded {len(sample_articles)} canonical disruption articles into MasterDB.")
+            else:
+                logger.info(f"MasterDB contains {count} existing articles.")
+        except Exception as seed_err:
+            logger.error(f"Failed to auto-seed articles: {seed_err}")
     except Exception as e:
         logger.error(f"Failed to initialize MasterDB: {e}")
 
@@ -169,8 +186,16 @@ async def startup_event():
 
     # Initialize VectorStore
     try:
-        app_state["vector_store"] = VectorStore()
-        logger.info(f"VectorStore loaded ({app_state['vector_store'].count()} items).")
+        vs = VectorStore()
+        app_state["vector_store"] = vs
+        logger.info(f"VectorStore loaded ({vs.count()} items).")
+        if vs.count() == 0:
+            logger.info("VectorStore is empty. Indexing canonical articles into ChromaDB...")
+            try:
+                await run_phase2a()
+                logger.info(f"VectorStore now populated ({vs.count()} items).")
+            except Exception as ve:
+                logger.error(f"Auto-indexing VectorStore failed: {ve}")
     except Exception as e:
         logger.error(f"Failed to load VectorStore: {e}")
 
@@ -180,6 +205,16 @@ async def startup_event():
         app_state["master_graph"] = mg
         graph_api_module.master_graph_instance = mg
         logger.info(f"MasterGraph loaded ({mg.graph.number_of_nodes()} nodes, {mg.graph.number_of_edges()} edges).")
+        if mg.graph.number_of_nodes() == 0:
+            logger.info("MasterGraph is empty. Constructing initial Master Graph...")
+            try:
+                mg = run_phase2b()
+                if mg:
+                    app_state["master_graph"] = mg
+                    graph_api_module.master_graph_instance = mg
+                    logger.info(f"MasterGraph now populated ({mg.graph.number_of_nodes()} nodes, {mg.graph.number_of_edges()} edges).")
+            except Exception as ge:
+                logger.error(f"Auto-constructing MasterGraph failed: {ge}")
     except Exception as e:
         logger.error(f"Failed to load MasterGraph: {e}")
 
@@ -280,19 +315,28 @@ async def query_articles(
     query: str = Query(..., description="Semantic search query"),
     top_k: int = Query(default=10, ge=1, le=50),
     event_category: Optional[str] = Query(default=None),
+    category: Optional[str] = Query(default=None),
 ):
     """
     Search historical supply-chain disruption events by semantic similarity.
+    Fast vector retrieval without LLM token generation latency.
     """
     rag_service: Optional[RAGService] = app_state.get("rag_service")
     if not rag_service:
-        raise HTTPException(status_code=503, detail="RAG service not ready")
+        rag_service = RAGService(
+            db=app_state.get("db"),
+            vector_store=app_state.get("vector_store"),
+            master_graph=app_state.get("master_graph"),
+            nebius_client=app_state.get("nebius_client"),
+        )
+        app_state["rag_service"] = rag_service
 
     try:
-        result = await rag_service.query_intelligence_async(
+        effective_category = category or event_category
+        result = rag_service.retrieve_parallels(
             query=query,
             top_k=top_k,
-            event_category=event_category,
+            event_category=effective_category,
         )
         return {
             "query": query,

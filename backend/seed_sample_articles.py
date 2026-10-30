@@ -197,6 +197,179 @@ sample_articles = [
             "Carriers reroute via Suez Canal or Magellan Strait adding 15 days travel",
             "US East Coast container freight rates increase by 45%"
         ]
+    },
+    {
+        "article_id": "e7b1a6f5c4d3e2f1a0b9c8d7e6f5a4b3",
+        "source_name": "Associated Press",
+        "source_type": "rss",
+        "title": "Francis Scott Key Bridge Collapse Halts Baltimore Port Cargo Operations",
+        "content_snippet": "Container ship collision with Key Bridge closes the Port of Baltimore, severing vital roll-on/roll-off automotive logistics and coal export channels.",
+        "url": "https://apnews.com/article/baltimore-key-bridge-collapse-shipping-2025",
+        "published_at": "2025-02-18T05:45:00Z",
+        "ingested_at": "2025-02-18T06:30:00Z",
+        "is_relevant": True,
+        "confidence": 0.95,
+        "relevance_score": 0.96,
+        "disruption_type": "logistics",
+        "event_category": "logistics",
+        "primary_commodities": ["automotive vehicles", "coal", "shipping containers"],
+        "all_entities": {
+            "organizations": ["csx", "norfolk southern", "general motors", "ford"],
+            "locations": ["baltimore", "port of baltimore", "chesapeake bay"],
+            "products_mentioned": ["cars", "coal", "containers"],
+            "events_mentioned": ["bridge collapse", "channel closure"],
+            "money_signals": ["$2 billion freight rerouting"],
+            "percent_signals": ["100% harbor closure"],
+            "entity_roles": {
+                "port of baltimore": "logistics_node",
+                "csx": "supplier",
+                "general motors": "consumer",
+                "ford": "consumer"
+            }
+        },
+        "relationships": [
+            ["bridge collapse", "disrupts", "port of baltimore"],
+            ["port of baltimore", "routes_through", "chesapeake bay"],
+            ["port of baltimore", "disrupts", "automotive vehicles"],
+            ["csx", "depends_on", "port of baltimore"],
+            ["general motors", "depends_on", "port of baltimore"]
+        ],
+        "economic_impact_chain": [
+            "Container vessel Dali strikes Francis Scott Key Bridge causing structural collapse",
+            "US Coast Guard suspends all commercial maritime vessel traffic in Baltimore Harbor",
+            "Major US automotive manufacturers reroute 800,000 vehicle imports to Norfolk and New York",
+            "East Coast railway freight corridors encounter yard congestion and intermodal delays",
+            "US metallurgical coal export shipments halted, spiking European steelmaking costs"
+        ]
+    },
+    {
+        "article_id": "f8c2b7a6d5e4f3a2b1c0d9e8f7a6b5c4",
+        "source_name": "Handelsblatt",
+        "source_type": "rss",
+        "title": "Rhine River Low Water Halts European Industrial Chemical Barges",
+        "content_snippet": "Summer heatwave reduces water depth at the Kaub gauge, forcing inland chemical and coal barges to load at only 25% capacity along the Rhine waterway.",
+        "url": "https://handelsblatt.com/rhine-river-drought-chemical-logistics-2025",
+        "published_at": "2025-02-22T09:15:00Z",
+        "ingested_at": "2025-02-22T10:00:00Z",
+        "is_relevant": True,
+        "confidence": 0.91,
+        "relevance_score": 0.93,
+        "disruption_type": "natural_disaster",
+        "event_category": "weather",
+        "primary_commodities": ["industrial chemicals", "coal", "plastics"],
+        "all_entities": {
+            "organizations": ["basf", "bayer", "thyssenkrupp"],
+            "locations": ["rhine river", "kaub", "ludwigshafen", "rotterdam"],
+            "products_mentioned": ["chemicals", "feedstock", "raw materials"],
+            "events_mentioned": ["drought", "water level drop"],
+            "money_signals": ["€500 million surcharge"],
+            "percent_signals": ["75% payload cut"],
+            "entity_roles": {
+                "rhine river": "logistics_node",
+                "kaub": "logistics_node",
+                "basf": "consumer",
+                "thyssenkrupp": "consumer"
+            }
+        },
+        "relationships": [
+            ["drought", "disrupts", "rhine river"],
+            ["rhine river", "disrupts", "industrial chemicals"],
+            ["basf", "depends_on", "rhine river"],
+            ["thyssenkrupp", "depends_on", "rhine river"]
+        ],
+        "economic_impact_chain": [
+            "Severe drought lowers Kaub chokepoint water depth below 40 centimeters",
+            "Inland freight barges restricted to quarter cargo capacity to avoid grounding",
+            "BASF and petrochemical majors declare force majeure on European specialty plastics",
+            "Inland logistics freight surcharges rise over 350% across Germany and Netherlands",
+            "Automotive manufacturing plants experience raw polymer component shortages"
+        ]
+    },
+    {
+        "article_id": "a9d3c8b7e6f5a4b3c2d1e0f9a8b7c6d5",
+        "source_name": "Lloyds List",
+        "source_type": "rss",
+        "title": "German Port Workers 48-Hour Strike Shuts Hamburg and Bremerhaven Terminals",
+        "content_snippet": "Ver.di trade union stages dockworker strike across key North Sea container hubs, halting container crane operations and backing up North European container flows.",
+        "url": "https://lloydslist.com/german-port-worker-strike-2025",
+        "published_at": "2025-02-25T11:00:00Z",
+        "ingested_at": "2025-02-25T11:30:00Z",
+        "is_relevant": True,
+        "confidence": 0.89,
+        "relevance_score": 0.91,
+        "disruption_type": "industrial",
+        "event_category": "industrial",
+        "primary_commodities": ["containerized electronics", "machinery", "automotive parts"],
+        "all_entities": {
+            "organizations": ["ver.di union", "hapag lloyd", "hhla", "volkswagen"],
+            "locations": ["hamburg", "bremerhaven", "north sea"],
+            "products_mentioned": ["containers", "auto components"],
+            "events_mentioned": ["dockworker strike", "crane shutdown"],
+            "money_signals": ["€1.2 billion backlog"],
+            "percent_signals": ["100% terminal halt"],
+            "entity_roles": {
+                "hamburg": "logistics_node",
+                "bremerhaven": "logistics_node",
+                "volkswagen": "consumer",
+                "hapag lloyd": "logistics_node"
+            }
+        },
+        "relationships": [
+            ["dockworker strike", "disrupts", "hamburg"],
+            ["hamburg", "disrupts", "containerized electronics"],
+            ["volkswagen", "depends_on", "bremerhaven"],
+            ["hapag lloyd", "depends_on", "hamburg"]
+        ],
+        "economic_impact_chain": [
+            "Dockworkers initiate 48-hour total work stoppage at HHLA container terminals",
+            "Over 45 mega-container vessels anchor offshore waiting for berths in North Sea",
+            "German automotive manufacturing assembly lines curtail production shifts",
+            "Container dwell times double to 12 days across regional logistics hubs",
+            "European intra-continental freight rates spike 28% on road feeder reallocation"
+        ]
+    },
+    {
+        "article_id": "b0e4d9c8f7a6b5c4d3e2f1a0b9c8d7e6",
+        "source_name": "Platts S&P Global",
+        "source_type": "rss",
+        "title": "Gulf of Mexico Hurricane Forces Shutdown of Offshore Oil and Gas Rigs",
+        "content_snippet": "Category 4 hurricane in the US Gulf of Mexico prompts evacuation of 180 offshore platforms, curtailing 42% of crude output and shuttering Houston export channels.",
+        "url": "https://spglobal.com/energy/gulf-hurricane-oil-gas-curtailment-2025",
+        "published_at": "2025-02-28T16:00:00Z",
+        "ingested_at": "2025-02-28T16:45:00Z",
+        "is_relevant": True,
+        "confidence": 0.93,
+        "relevance_score": 0.95,
+        "disruption_type": "natural_disaster",
+        "event_category": "weather",
+        "primary_commodities": ["crude oil", "natural gas", "gasoline"],
+        "all_entities": {
+            "organizations": ["chevron", "shell", "bsee", "valero"],
+            "locations": ["gulf of mexico", "houston ship channel", "louisiana coast"],
+            "products_mentioned": ["crude", "offshore gas", "refined fuels"],
+            "events_mentioned": ["hurricane", "platform evacuation"],
+            "money_signals": ["$96 per barrel"],
+            "percent_signals": ["42% production shutdown"],
+            "entity_roles": {
+                "gulf of mexico": "logistics_node",
+                "houston ship channel": "logistics_node",
+                "chevron": "supplier",
+                "valero": "consumer"
+            }
+        },
+        "relationships": [
+            ["hurricane", "disrupts", "gulf of mexico"],
+            ["gulf of mexico", "disrupts", "crude oil"],
+            ["chevron", "depends_on", "gulf of mexico"],
+            ["valero", "depends_on", "crude oil"]
+        ],
+        "economic_impact_chain": [
+            "Category 4 Hurricane sweeps through primary oil lease blocks in US Gulf",
+            "BSEE reports shut-in of 850,000 barrels per day of domestic crude production",
+            "Houston Ship Channel closes to deep-draft tanker navigation",
+            "US Gulf Coast refinery runs drop 18% on crude feedstock interruption",
+            "Wholesale gasoline futures surge 14% on immediate regional retail supply constraints"
+        ]
     }
 ]
 
