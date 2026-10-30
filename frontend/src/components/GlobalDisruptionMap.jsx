@@ -3,7 +3,7 @@ import { Globe as GlobeIcon, ChevronDown, Plus, Minus, RotateCcw, Move, Check } 
 import useDashboardStore from '../state/dashboardStore';
 import worldTopology from '../data/worldBoundaries.json';
 import * as topojson from 'topojson-client';
-import GlobeViewer from './GlobeViewer';
+import GlobeViewer, { getHotspotTier, getSeverityDotColor, getSeverityRingColor } from './GlobeViewer';
 
 // Convert lat/lng to Equirectangular SVG coordinates (800 x 420 viewBox)
 function projectCoords(lat, lng, width = 800, height = 420) {
@@ -374,22 +374,10 @@ export default function GlobalDisruptionMap() {
                 const isHovered = hoveredHotspot?.id === hotspot.id;
                 const isSelected = selectedHotspot?.id === hotspot.id;
 
-                let ringColor = 'rgba(234, 179, 8, 0.4)';
-                let dotColor = '#EAB308';
-                let filterId = 'none';
-
-                if (hotspot.color === 'red' || (hotspot.intensity || 0) >= 0.7) {
-                  ringColor = 'rgba(239, 68, 68, 0.45)';
-                  dotColor = '#EF4444';
-                  filterId = 'url(#glow-red)';
-                } else if (hotspot.color === 'orange' || (hotspot.intensity || 0) >= 0.4) {
-                  ringColor = 'rgba(249, 115, 22, 0.45)';
-                  dotColor = '#F97316';
-                  filterId = 'url(#glow-orange)';
-                } else if (hotspot.color === 'green' || (hotspot.intensity || 0) < 0.2) {
-                  ringColor = 'rgba(253, 224, 71, 0.3)';
-                  dotColor = '#FDE047';
-                }
+                const tier = getHotspotTier(hotspot);
+                const dotColor = getSeverityDotColor(hotspot);
+                const ringColor = getSeverityRingColor(hotspot);
+                const filterId = tier === 'severe' ? 'url(#glow-red)' : tier === 'high' ? 'url(#glow-orange)' : 'none';
 
                 return (
                   <g
@@ -449,13 +437,8 @@ export default function GlobalDisruptionMap() {
               >
                 <div className="font-bold text-sm text-white flex items-center gap-1.5">
                   <span
-                    className={`w-2 h-2 rounded-full ${
-                      hoveredHotspot.color === 'red'
-                        ? 'bg-red-500'
-                        : hoveredHotspot.color === 'orange'
-                        ? 'bg-orange-500'
-                        : 'bg-yellow-400'
-                    }`}
+                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+                    style={{ backgroundColor: getSeverityDotColor(hoveredHotspot) }}
                   />
                   {hoveredHotspot.label || hoveredHotspot.id.toUpperCase()}
                 </div>
@@ -473,21 +456,21 @@ export default function GlobalDisruptionMap() {
         )}
 
         {/* Bottom-Left Severity Legend matching reference image */}
-        <div className="absolute bottom-3 left-3 bg-[#70401D]/90 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10 text-xs shadow-md z-10 flex flex-col gap-1.5">
+        <div className="absolute bottom-3 left-3 bg-[#70401D]/90 backdrop-blur-xs px-3 py-2 rounded-xl border border-white/10 text-xs shadow-md z-10 flex flex-col gap-1.5 pointer-events-none">
           <div className="flex items-center gap-2 text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-xs" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-xs" />
             <span className="text-[11px] font-medium text-[#F4ECE1]">Severe</span>
           </div>
           <div className="flex items-center gap-2 text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-xs" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#F97316] shadow-xs" />
             <span className="text-[11px] font-medium text-[#F4ECE1]">High</span>
           </div>
           <div className="flex items-center gap-2 text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-400 shadow-xs" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#EAB308] shadow-xs" />
             <span className="text-[11px] font-medium text-[#F4ECE1]">Medium</span>
           </div>
           <div className="flex items-center gap-2 text-white">
-            <span className="w-2.5 h-2.5 rounded-full bg-yellow-100 shadow-xs" />
+            <span className="w-2.5 h-2.5 rounded-full bg-[#FEF08A] shadow-xs" />
             <span className="text-[11px] font-medium text-[#F4ECE1]">Low</span>
           </div>
         </div>
