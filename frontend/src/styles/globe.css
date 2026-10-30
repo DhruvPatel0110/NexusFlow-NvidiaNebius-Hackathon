@@ -1,0 +1,108 @@
+/* ==========================================================================
+   Globe Styles & Pulsing Animations (Link_Backend_Globe.md Step 6)
+   ========================================================================== */
+
+.globe-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  overflow: hidden;
+}
+
+.globe-loader,
+.globe-error,
+.globe-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: #fff;
+  font-family: system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.globe-error {
+  color: #ff6b6b;
+}
+
+.hotspot-info-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(12px);
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #ef4444;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 320px;
+  font-family: system-ui, -apple-system, sans-serif;
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.6);
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 50;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hotspot-info-panel h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f87171;
+}
+
+.hotspot-info-panel p {
+  margin: 6px 0;
+  font-size: 0.88rem;
+  color: #cbd5e1;
+}
+
+.hotspot-info-panel p strong {
+  color: #f1f5f9;
+}
+
+.hotspot-info-panel button {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.hotspot-info-panel button:hover {
+  background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+  transform: translateY(-1px);
+}
+
+/* Ring pulsing animation */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    r: 0;
+  }
+  100% {
+    opacity: 0;
+    r: 40;
+  }
+}
