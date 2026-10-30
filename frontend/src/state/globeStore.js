@@ -29,15 +29,9 @@ export const useGlobeStore = create((set, get) => ({
    */
   fetchHotspots: async () => {
     set({ loading: true, error: null });
+    const BASE_URL = import.meta.env.VITE_API_URL || '';
     try {
-      let response;
-      try {
-        response = await fetch('/api/master_graph/hotspots');
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      } catch (proxyErr) {
-        response = await fetch('http://localhost:8000/api/master_graph/hotspots');
-      }
-
+      const response = await fetch(`${BASE_URL}/api/master_graph/hotspots`);
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
