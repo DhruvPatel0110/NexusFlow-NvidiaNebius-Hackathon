@@ -729,10 +729,12 @@ class MasterGraph:
             else:
                 base_intensity = 0.15
 
-            # Apply time decay if last_updated is available
+            # Apply time decay only to dynamic live events that have aged past 24 hours,
+            # but preserve ongoing canonical crisis hubs to represent all 4 severity tiers
             last_updated = h.get('last_updated')
             time_decay = 1.0
-            if last_updated:
+            is_canonical = key in [b["id"] for b in canonical_baselines]
+            if last_updated and not is_canonical:
                 try:
                     if isinstance(last_updated, str):
                         dt = datetime.fromisoformat(last_updated.replace("Z", "+00:00"))
@@ -744,7 +746,7 @@ class MasterGraph:
                         if dt.tzinfo is None:
                             dt = dt.replace(tzinfo=timezone.utc)
                         hours_ago = (datetime.now(timezone.utc) - dt).total_seconds() / 3600.0
-                        time_decay = max(0.3, 1.0 - (hours_ago / 168.0))
+                        time_decay = max(0.4, 1.0 - (hours_ago / 168.0))
                 except Exception:
                     time_decay = 1.0
 
