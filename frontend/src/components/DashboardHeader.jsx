@@ -31,7 +31,7 @@ export default function DashboardHeader() {
       {/* Title & Greeting */}
       <div>
         <div className="text-xs font-semibold text-[#594537] tracking-wide mb-0.5">
-          Good Morning, Dhruv
+          Good Morning, User
         </div>
         <h1 className="text-2xl md:text-3xl font-extrabold text-[#17130F] tracking-tight">
           Global Supply Chain at a Glance

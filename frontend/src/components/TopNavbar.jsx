@@ -43,8 +43,8 @@ export default function TopNavbar() {
 
         {/* User Avatar */}
         <div className="flex items-center gap-2.5 pl-2 border-l border-[#D8CEBA]">
-          <div className="w-9 h-9 rounded-full bg-[#895129] text-white flex items-center justify-center font-bold text-sm shadow-sm border border-[#70401D]">
-            D
+          <div className="w-9 h-9 rounded-full bg-[#895129] text-white flex items-center justify-center font-bold text-sm shadow-sm border border-[#70401D]" title="User Profile">
+            U
           </div>
         </div>
       </div>
