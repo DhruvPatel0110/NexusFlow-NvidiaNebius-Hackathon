@@ -13,6 +13,50 @@ import {
 } from 'lucide-react';
 import useDashboardStore from '../../state/dashboardStore';
 
+// Safe rendering helpers to prevent React Child Object crashes from dynamic LLM outputs
+function renderText(item) {
+  if (!item) return '';
+  if (typeof item === 'string') return item;
+  if (typeof item === 'number') return String(item);
+  if (typeof item === 'object') {
+    return (
+      item.description ||
+      item.statement ||
+      item.risk ||
+      item.uncertainty ||
+      item.step ||
+      item.detail ||
+      item.text ||
+      item.name ||
+      item.commodity ||
+      JSON.stringify(item)
+    );
+  }
+  return String(item);
+}
+
+function renderFactItem(fact) {
+  if (!fact) return null;
+  if (typeof fact === 'string') {
+    return <span>{fact}</span>;
+  }
+  if (typeof fact === 'object') {
+    const text = fact.fact || fact.statement || fact.text || fact.description || JSON.stringify(fact);
+    const citation = fact.citation || fact.source || null;
+    return (
+      <span className="inline-flex flex-wrap items-center gap-1.5">
+        <span>{text}</span>
+        {citation && (
+          <span className="text-[10px] font-mono text-amber-300 bg-black/25 px-1.5 py-0.5 rounded border border-amber-300/20">
+            [{citation}]
+          </span>
+        )}
+      </span>
+    );
+  }
+  return <span>{String(fact)}</span>;
+}
+
 const PRESET_QUERIES = [
   'Red Sea maritime attacks causing shipping reroutes around Africa',
   'Panama Canal drought slashes daily vessel transits by 35%',
@@ -160,7 +204,7 @@ export default function EventAnalysisPage() {
               Contextual Synthesis
             </h4>
             <p className="text-sm text-white leading-relaxed bg-[#70401D] p-4 rounded-xl border border-white/10">
-              {impact.event_summary}
+              {renderText(impact.event_summary)}
             </p>
           </div>
 
@@ -177,7 +221,7 @@ export default function EventAnalysisPage() {
                 <div className="flex flex-wrap gap-1.5">
                   {(impact.primary_affected_commodities || []).map((c, i) => (
                     <span key={i} className="bg-[#70401D] text-white text-xs px-2.5 py-1 rounded-md font-medium capitalize border border-white/10">
-                      {c}
+                      {renderText(c)}
                     </span>
                   ))}
                 </div>
@@ -186,12 +230,15 @@ export default function EventAnalysisPage() {
               {impact.affected_entities && (
                 <div className="space-y-2 pt-2 border-t border-white/10 text-xs">
                   {Object.entries(impact.affected_entities).map(([role, list]) => {
-                    if (!list || list.length === 0) return null;
+                    if (!list || (Array.isArray(list) && list.length === 0)) return null;
+                    const formatted = Array.isArray(list)
+                      ? list.map((item) => renderText(item)).join(', ')
+                      : renderText(list);
                     return (
                       <div key={role} className="flex justify-between items-start gap-2 bg-[#70401D] p-2 rounded-lg">
                         <span className="text-[#DDD2C0] capitalize font-medium">{role.replace('_', ' ')}:</span>
                         <span className="text-white font-semibold text-right">
-                          {Array.isArray(list) ? list.join(', ') : String(list)}
+                          {formatted}
                         </span>
                       </div>
                     );
@@ -212,7 +259,7 @@ export default function EventAnalysisPage() {
                     <span className="w-5 h-5 rounded-full bg-[#895129] text-white font-bold text-[10px] flex items-center justify-center shrink-0 border border-white/20 mt-0.5">
                       {idx + 1}
                     </span>
-                    <span className="text-[#F0E6D8] leading-relaxed">{step}</span>
+                    <span className="text-[#F0E6D8] leading-relaxed">{renderText(step)}</span>
                   </div>
                 ))}
               </div>
@@ -227,23 +274,28 @@ export default function EventAnalysisPage() {
                 <span>Historical Precedents Retrieved via Vector RAG</span>
               </h4>
               <div className={`grid gap-4 ${impact.historical_parallels_analysis.length === 1 ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
-                {impact.historical_parallels_analysis.map((p, idx) => (
-                  <div key={idx} className="bg-[#70401D] p-5 rounded-xl border border-white/10 space-y-2.5 text-xs w-full shadow-xs">
-                    <div className="font-bold text-white text-sm md:text-base leading-snug">
-                      {p.parallel_title}
+                {impact.historical_parallels_analysis.map((p, idx) => {
+                  const title = p.parallel_title || p.title || `Precedent ${idx + 1}`;
+                  const overlap = renderText(p.mechanism_overlap);
+                  const diffs = renderText(p.key_differences);
+                  return (
+                    <div key={idx} className="bg-[#70401D] p-5 rounded-xl border border-white/10 space-y-2.5 text-xs w-full shadow-xs">
+                      <div className="font-bold text-white text-sm md:text-base leading-snug">
+                        {title}
+                      </div>
+                      {overlap && (
+                        <div className="text-[#DDD2C0] leading-relaxed">
+                          <strong className="text-amber-300 font-semibold">Mechanism Overlap:</strong> {overlap}
+                        </div>
+                      )}
+                      {diffs && (
+                        <div className="text-[#DDD2C0] leading-relaxed">
+                          <strong className="text-stone-300 font-semibold">Key Differences:</strong> {diffs}
+                        </div>
+                      )}
                     </div>
-                    {p.mechanism_overlap && (
-                      <div className="text-[#DDD2C0] leading-relaxed">
-                        <strong className="text-amber-300 font-semibold">Mechanism Overlap:</strong> {p.mechanism_overlap}
-                      </div>
-                    )}
-                    {p.key_differences && (
-                      <div className="text-[#DDD2C0] leading-relaxed">
-                        <strong className="text-stone-300 font-semibold">Key Differences:</strong> {p.key_differences}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -259,7 +311,7 @@ export default function EventAnalysisPage() {
               <ul className="space-y-2 text-xs text-[#EAE0D1]">
                 {(impact.evidence_backed_facts || []).map((fact, idx) => (
                   <li key={idx} className="bg-[#70401D] p-2.5 rounded-lg border border-white/5 leading-relaxed">
-                    • {fact}
+                    • {renderFactItem(fact)}
                   </li>
                 ))}
               </ul>
@@ -274,7 +326,7 @@ export default function EventAnalysisPage() {
               <ul className="space-y-2 text-xs text-[#EAE0D1]">
                 {(impact.plausible_inferred_risks || []).map((risk, idx) => (
                   <li key={idx} className="bg-[#70401D] p-2.5 rounded-lg border border-white/5 leading-relaxed">
-                    • {risk}
+                    • {renderText(risk)}
                   </li>
                 ))}
               </ul>
@@ -289,7 +341,7 @@ export default function EventAnalysisPage() {
               <ul className="space-y-2 text-xs text-[#EAE0D1]">
                 {(impact.explicit_uncertainties || []).map((unc, idx) => (
                   <li key={idx} className="bg-[#70401D] p-2.5 rounded-lg border border-white/5 leading-relaxed">
-                    • {unc}
+                    • {renderText(unc)}
                   </li>
                 ))}
               </ul>

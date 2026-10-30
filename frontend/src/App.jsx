@@ -11,6 +11,7 @@ import HistoricalParallelsPage from './components/pages/HistoricalParallelsPage'
 import DataSourcesPage from './components/pages/DataSourcesPage';
 import SystemStatusPage from './components/pages/SystemStatusPage';
 import EventDetailModal from './components/EventDetailModal';
+import ErrorBoundary from './components/ErrorBoundary';
 
 export default function App() {
   const activeTab = useDashboardStore((state) => state.activeTab);
@@ -60,7 +61,9 @@ export default function App() {
         {/* Scrollable View Container */}
         <main className="flex-1 p-6 md:p-8 overflow-y-auto">
           <div className="max-w-[1600px] mx-auto">
-            {renderActiveTab()}
+            <ErrorBoundary>
+              {renderActiveTab()}
+            </ErrorBoundary>
           </div>
         </main>
       </div>

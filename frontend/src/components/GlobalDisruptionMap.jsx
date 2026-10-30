@@ -130,7 +130,6 @@ export default function GlobalDisruptionMap() {
 
   // Wheel Zoom Handler
   const handleWheel = (e) => {
-    e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
     setZoomLevel((prev) => Math.min(Math.max(prev * zoomFactor, 0.8), 4.0));
   };
