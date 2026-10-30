@@ -24,14 +24,24 @@ export const useGlobeStore = create((set, get) => ({
 
   /**
    * Fetch hotspots from backend master graph API.
-   * Tries relative '/api/master_graph/hotspots' first (Vite proxy),
-   * falls back to 'http://localhost:8000/api/master_graph/hotspots'.
+   * Uses VITE_API_URL in production, falls back to relative /api or localhost in development.
    */
   fetchHotspots: async () => {
     set({ loading: true, error: null });
     const BASE_URL = import.meta.env.VITE_API_URL || '';
     try {
-      const response = await fetch(`${BASE_URL}/api/master_graph/hotspots`);
+      let response;
+      try {
+        response = await fetch(`${BASE_URL}/api/master_graph/hotspots`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      } catch (err) {
+        if (!BASE_URL) {
+          response = await fetch('http://localhost:8000/api/master_graph/hotspots');
+        } else {
+          throw err;
+        }
+      }
+
       if (!response.ok) {
         throw new Error(`API error: ${response.status}`);
       }
