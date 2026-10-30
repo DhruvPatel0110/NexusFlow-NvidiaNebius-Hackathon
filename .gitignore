@@ -31,9 +31,10 @@ backend/.env
 *.db*
 *.sqlite
 *.sqlite3
-data/
+/data/
 backend/data/*.db*
 backend/data/chroma_db/
+!frontend/src/data/
 .cache/
 *.log
 scratch_rag_output.txt
